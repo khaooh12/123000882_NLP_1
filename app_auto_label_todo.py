@@ -41,8 +41,6 @@ def detect_spam(text: str) -> bool:
     if re.search(r"(\d[\d\.\-]{8,}\d)", t):
         return True
 
-    # Gợi ý: spam_keywords = ["liên hệ", "inbox", "dm", "giá rẻ", ...]
-    # Dùng any(kw in t for kw in spam_keywords) để kiểm tra
     if spam_pattern.search(t):
         return True
 
@@ -120,7 +118,7 @@ df["spam_label_vn"] = df["spam_label"].map({"spam": "Spam", "không spam": "Khô
 
 # TODO 14: Tạo dict map sentiment tiếng Anh -> tiếng Việt và tạo cột sentiment_label_vn
 sentiment_vn_map = {"positive": "Tích cực", "negative": "Tiêu cực", "neutral": "Trung lập"}
-df["sentiment_label_vn"] = df["sentiment_label"].map(sentiment_vn_map).fillna(df["sentiment_label"])
+df["sentiment_label_vn"] = df["sentiment_label"].map(sentiment_vn_map).fillna("Trung lập")
 
 progress.empty()
 st.success("Hoàn tất xử lý!")
@@ -143,5 +141,5 @@ st.dataframe(df[display_cols], use_container_width=True)
 
 # TODO 16: Xuất CSV và tạo nút download
 # Gợi ý:
-csv_data = df[display_cols].to_csv(index=False, encoding="utf-8")
+csv_data = df[display_cols].to_csv(index=False, encoding="utf-8-sig")
 st.download_button(label="⬇ Tải về", data=csv_data, file_name="auto_labels_output.csv", mime="text/csv")
