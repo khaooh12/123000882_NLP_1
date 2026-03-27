@@ -90,13 +90,12 @@ for i, row in df.iterrows():
     text = str(row["text"])
 
     # TODO 9: Dùng word_tokenize để phân tách từ (format="text")
-    # tokens = word_tokenize(...)
     tokens = word_tokenize(text, format="text")  # <-- thay dòng này
     tokenized_list.append(tokens)
 
     # TODO 10: Dùng hàm sentiment() để gán nhãn cảm xúc
     # label = sentiment(...)
-    label = sentiment(text)  # <-- thay dòng này
+    label = sentiment(tokens)  # <-- thay dòng này
     sentiment_list.append(label)
 
     progress.progress((i + 1) / len(df))
