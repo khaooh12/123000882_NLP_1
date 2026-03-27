@@ -91,12 +91,12 @@ for i, row in df.iterrows():
 
     # TODO 9: Dùng word_tokenize để phân tách từ (format="text")
     # tokens = word_tokenize(...)
-    tokens = text  # <-- thay dòng này
+    tokens = word_tokenize(text, format="text")  # <-- thay dòng này
     tokenized_list.append(tokens)
 
     # TODO 10: Dùng hàm sentiment() để gán nhãn cảm xúc
     # label = sentiment(...)
-    label = "neutral"  # <-- thay dòng này
+    label = sentiment(text)  # <-- thay dòng này
     sentiment_list.append(label)
 
     progress.progress((i + 1) / len(df))
@@ -110,19 +110,18 @@ df["sentiment_label"] = sentiment_list
 
 # TODO 11: Dùng hàm detect_spam để tạo cột "spam" (True/False)
 # df["spam"] = df["text"].apply(lambda x: detect_spam(str(x)))
-df["spam"] = False  # <-- thay dòng này
+df["spam"] = df["text"].apply(lambda x: detect_spam(str(x)))  # <-- thay dòng này
 
 # TODO 12: Tạo cột spam_label ("spam" / "không spam") từ cột spam
 # Gợi ý: df["spam_label"] = df["spam"].map({True: "spam", False: "không spam"})
-df["spam_label"] = "không spam"  # <-- thay dòng này
+df["spam_label"] = df["spam"].map({True: "spam", False: "không spam"})  # <-- thay dòng này
 
 # TODO 13: Tạo cột spam_label_vn ("Spam" / "Không spam") từ cột spam
-df["spam_label_vn"] = "Không spam"  # <-- thay dòng này
+df["spam_label_vn"] = df["spam_label"].map({"spam": "Spam", "không spam": "Không spam"})  # <-- thay dòng này
 
 # TODO 14: Tạo dict map sentiment tiếng Anh -> tiếng Việt và tạo cột sentiment_label_vn
-# sentiment_vn_map = {"positive": "Tích cực", "negative": "Tiêu cực", "neutral": "Trung lập"}
-# df["sentiment_label_vn"] = df["sentiment_label"].map(sentiment_vn_map).fillna(df["sentiment_label"])
-df["sentiment_label_vn"] = df["sentiment_label"]  # <-- thay dòng này
+sentiment_vn_map = {"positive": "Tích cực", "negative": "Tiêu cực", "neutral": "Trung lập"}
+df["sentiment_label_vn"] = df["sentiment_label"].map(sentiment_vn_map).fillna(df["sentiment_label"])
 
 progress.empty()
 st.success("Hoàn tất xử lý!")
@@ -134,9 +133,9 @@ st.success("Hoàn tất xử lý!")
 
 # TODO 15: Hiển thị biểu đồ thống kê cảm xúc và spam
 # Gợi ý: dùng st.subheader, st.columns, st.bar_chart
-# col1, col2 = st.columns(2)
-# with col1: st.bar_chart(df["sentiment_label_vn"].value_counts())
-# with col2: st.bar_chart(df["spam_label_vn"].value_counts())
+col1, col2 = st.columns(2)
+with col1: st.bar_chart(df["sentiment_label_vn"].value_counts())
+with col2: st.bar_chart(df["spam_label_vn"].value_counts())
 
 # Hiển thị bảng kết quả
 st.subheader("Kết quả chi tiết")
@@ -145,5 +144,5 @@ st.dataframe(df[display_cols], use_container_width=True)
 
 # TODO 16: Xuất CSV và tạo nút download
 # Gợi ý:
-# csv_data = df[display_cols].to_csv(index=False, encoding="utf-8")
-# st.download_button(label="⬇ Tải về", data=csv_data, file_name="auto_labels_output.csv", mime="text/csv")
+csv_data = df[display_cols].to_csv(index=False, encoding="utf-8")
+st.download_button(label="⬇ Tải về", data=csv_data, file_name="auto_labels_output.csv", mime="text/csv")
