@@ -12,13 +12,16 @@ Hướng dẫn:
 import re
 import streamlit as st
 import pandas as pd
-# TODO 1: Import hai hàm word_tokenize và sentiment từ thư viện underthesea
-# from underthesea import ...
+from underthesea import word_tokenize, sentiment
 
 
 # ============================================================================
 # HÀM PHÁT HIỆN SPAM
 # ============================================================================
+
+spam_keywords = ["liên hệ", "inbox", "dm", "giá rẻ", "miễn phí", "zalo"]
+spam_pattern = re.compile("|".join(map(re.escape, spam_keywords)))  
+
 def detect_spam(text: str) -> bool:
     """
     Phát hiện comment spam dựa trên các đặc điểm phổ biến.
@@ -32,26 +35,19 @@ def detect_spam(text: str) -> bool:
     """
     t = text.lower()
 
-    # TODO 2: Dùng re.search để kiểm tra xem text có chứa link không
-    # Gợi ý regex: r"https?://|www\.|\.com|\.vn|\.net|bit\.ly"
-    # if re.search(...):
-    #     return True
+    if re.search(r"https?://|www\.|\.com|\.vn|\.net|bit\.ly", t):
+        return True
 
-    # TODO 3: Dùng re.search để kiểm tra số điện thoại
-    # Gợi ý regex: r"(\d[\d\.\-]{8,}\d)"
-    # if re.search(...):
-    #     return True
+    if re.search(r"(\d[\d\.\-]{8,}\d)", t):
+        return True
 
-    # TODO 4: Tạo danh sách từ khóa spam và kiểm tra
     # Gợi ý: spam_keywords = ["liên hệ", "inbox", "dm", "giá rẻ", ...]
     # Dùng any(kw in t for kw in spam_keywords) để kiểm tra
-    # if any(...):
-    #     return True
+    if spam_pattern.search(t):
+        return True
 
-    # TODO 5: Dùng re.search để phát hiện lặp ký tự bất thường
-    # Gợi ý regex: r"(.)\1{5,}" — ký tự lặp >= 6 lần
-    # if re.search(...):
-    #     return True
+    if re.search(r"(.)\1{5,}", t):
+        return True
 
     return False
 
@@ -72,22 +68,17 @@ st.markdown(
     "- **Gán nhãn cảm xúc** tự động (positive / negative / neutral)"
 )
 
-# TODO 6: Tạo file uploader cho file CSV
-# Gợi ý: uploaded_file = st.file_uploader(...)
-uploaded_file = None  # <-- thay dòng này
+uploaded_file = st.file_uploader("Chọn file CSV", type="csv")  # <-- thay dòng này
 
 if uploaded_file is None:
     st.info("Vui lòng upload file CSV để bắt đầu.")
     st.stop()
 
-# TODO 7: Đọc file CSV bằng pandas
-# df = pd.read_csv(...)
-df = None  # <-- thay dòng này
+df = pd.read_csv(uploaded_file)
 
-# TODO 8: Kiểm tra file CSV có cột "id" và "text" không
-# Gợi ý: dùng {"id", "text"}.issubset(df.columns)
-# Nếu không có, hiển thị st.error(...) và st.stop()
-
+if not {"id", "text"}.issubset(df.columns):
+    st.error("File CSV phải chứa cột 'id' và 'text'. Vui lòng kiểm tra lại.")
+    st.stop()
 st.success(f"Đã load {len(df)} dòng. Đang xử lý...")
 
 progress = st.progress(0)
